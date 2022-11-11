@@ -2,8 +2,6 @@ const express = require("express");
 const Agents = require("./agent-model");
 const validate = require("../validate");
 const joi = require("joi");
-const { route } = require("../admins/admin-route");
-
 const router = express.Router();
 
 router.post('/registration', async (req, res) => {
@@ -13,21 +11,38 @@ router.post('/registration', async (req, res) => {
         email: req.body.email,
         nominee: {
             name: req.body.nominee.name,
-            phone: req.body.nominee.phone,
+            mobile: req.body.nominee.mobile,
             address: req.body.nominee.address,
             relationship: req.body.nominee.relationship
         },
-        agentID: req.body.agentID
     }
     const validate = await validateUser(agent);
     if (validate.isValid) {
-        try {
-            const agents = await addAgents(agent);
-            res.status(200).send(agents)
-        } catch (err) {
-            res.status(err.status).send(err.message)
+        const agentID = req.body.agentID;
+        agent.agentID = agentID;
+        if (agent.agentID === 'NA') {
+            Agents.find({}, async (err, response) => {
+                if (err) {
+                    res.status(500).send("Network error, try again")
+                } else {
+                    let count = response.length;
+                    if (count > 0) {
+                        agent.agentID = `AGT${count + 1}`
+                        console.log("agent ", agent);
+                    } else {
+                        count = 1;
+                        agent.agentID = `AGT${count}`
+                    }
+                    try {
+                        const agents = await addAgents(agent);
+                        res.status(200).send(agents)
+                    } catch (err) {
+                        res.status(err.status).send(err)
+                    }
+                }
+            })
         }
-    }else{
+    } else {
         res.status(400).send(`Bad Request, ${validate.error}`)
     }
 });
@@ -35,13 +50,11 @@ router.post('/registration', async (req, res) => {
 const validateUser = (agent) => {
     const user = {
         email: agent.email,
-        agentID: agent.agentID,
         phone: agent.phone
     };
 
     const schema = joi.object({
         email: joi.string().min(10).max(255).required().email(),
-        agentID: joi.string().min(5).max(100).required(),
         phone: joi.string().length(10).pattern(/^[0-9]+$/).required(),
     });
 
@@ -64,7 +77,7 @@ const addAgents = (agent) => {
         newAgent.save((err, user) => {
             if (err) {
                 if (err.index === 0 && err.code === 11000) {
-                    reject({ status: 422, message: 'User already exist!' });
+                    reject({ status: 422, message: 'User already exist!', keyPattern: err.keyPattern});
                 }
             } else {
                 resolve(user)
