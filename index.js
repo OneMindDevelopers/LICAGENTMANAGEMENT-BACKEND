@@ -18,7 +18,7 @@ app.use("/item", item)
 const port = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-    res.send("Hello Node JS World!...")
+    res.send("Hello NodeJS World!...")
 });
 
 app.listen(port, () => {
