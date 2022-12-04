@@ -9,7 +9,9 @@ const router = express.Router();
 // api to fetch agent information based on agentID or customer phone number
 router.post("/fetchAgent", async (req, res) => {
     const input = req.body.input;
-
+    console.log("input -->", input)
+    // "input": "XCV12333",
+    // "input": "9449611122"
     if (/^[0-9]+$/.test(input)) {
         console.log("its phone number");
         const phone = input;
@@ -20,10 +22,14 @@ router.post("/fetchAgent", async (req, res) => {
                 if (response) {
                     res.status(200).send({
                         name: response.name,
-                        agentID: response.cus_agent_id
+                        agentID: response.cus_agent_id,
+                        agentExist: true
                     });
                 } else {
-                    res.send("Agent Not Found...")
+                    res.status(200).send({
+                        data: "Agent Not Found",
+                        agentExist: false
+                    });
                 }
             }
         })
@@ -37,10 +43,14 @@ router.post("/fetchAgent", async (req, res) => {
                 if (response) {
                     res.status(200).send({
                         name: response.name,
-                        agentID: response.agentID
+                        agentID: response.cus_agent_id,
+                        agentExist: true
                     });
                 } else {
-                    res.send("Agent Not Found...")
+                    res.status(200).send({
+                        data: "Agent Not Found",
+                        agentExist: false
+                    });
                 }
             }
         })

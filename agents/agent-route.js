@@ -41,6 +41,13 @@ router.post('/registration', async (req, res) => {
                     }
                 }
             })
+        }else{
+            try {
+                const agents = await addAgents(agent);
+                res.status(200).send(agents)
+            } catch (err) {
+                res.status(err.status).send(err)
+            }
         }
     } else {
         res.status(400).send(`Bad Request, ${validate.error}`)
