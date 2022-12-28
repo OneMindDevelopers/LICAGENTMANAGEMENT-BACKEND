@@ -6,6 +6,7 @@ const Items = require("../items/item-model");
 
 const uploadXLSX = async (req, res, next) => {
   try {
+    console.log('req',req);
     let path = req.file.path;
     console.log("path-->", path)
     var workbook = XLSX.readFile(path);
@@ -20,7 +21,7 @@ const uploadXLSX = async (req, res, next) => {
       });
     }
 
-    // console.log("jsonData-->", jsonData);
+   //  console.log("jsonData-->", jsonData);
     const result = jsonData.map(item => ({
         name: item["__EMPTY"], 
         brand: item["__EMPTY_1"],
@@ -29,15 +30,18 @@ const uploadXLSX = async (req, res, next) => {
         quantity: item["__EMPTY_4"],
         slno: item["__EMPTY_5"],
     }));
+
+    //console.log('result',result);
     const items = result.slice(1);
     // console.log("result-->", items)
+
     
     Items.insertMany(items, function (err, result) {
         if (err) {
             console.log(err);
         };
         // console.log(result);
-        res.status(200).send(result);
+        res.status(200).send(jsonData);
         // res.status(200).send("Record created successfully.");
         // res.status(201).json({
         //   success: true,

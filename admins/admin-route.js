@@ -64,8 +64,8 @@ router.post("/registration", async (req, res) => {
 
 router.post("/forgotPassword", (req, res) => {
   const phone = req.body.phone;
-  const password = req.body.new_password;
-  const confirmPassword = req.body.conf_pwd;
+  const password = req.body.password;
+  const confirmPassword = req.body.confirmPassword;
   admins.findOneAndUpdate(
     { phone },
     { $set: { password, confirmPassword } },
