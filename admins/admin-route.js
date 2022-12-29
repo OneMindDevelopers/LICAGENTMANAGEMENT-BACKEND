@@ -4,6 +4,7 @@ const validate = require("../validate");
 const jwt = require("jsonwebtoken");
 const joi = require("joi");
 const config = require("config");
+const bcrypt = require("bcrypt");
 
 const router = express.Router();
 
@@ -22,8 +23,38 @@ router.get("/getUsers", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
+  // try {
+  //   const admin = await getUser(req.body);
+  //   if (admin) {
+  //     const token = await jwt.sign(
+  //       {
+  //         name: admin.name,
+  //         phone: admin.phone,
+  //         email: admin.email,
+  //       },
+  //       config.get("jwtPrivateKey")
+  //     );
+  //     res.status(200).send(token);
+  //   } else {
+  //     res.status(404).send("User not found.");
+  //   }
+  // } catch (err) {
+  //   res.status(500).send("Network error");
+  // }
   try {
-    const admin = await getUser(req.body);
+    const { error } = validateLogin(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    let admin = await admins.findOne({ phone: req.body.phone });
+    console.log("user", admin);
+    if (!admin) return res.status(400).send("Mobile Number is not registered.");
+
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      admin.password
+    );
+    if (!validPassword) return res.status(400).send("Password is not correct");
+
     if (admin) {
       const token = await jwt.sign(
         {
@@ -54,6 +85,12 @@ router.post("/registration", async (req, res) => {
   try {
     const validate = await validateUser(newUser);
     if (validate) {
+      const salt = await bcrypt.genSalt(10);
+      newUser.password = await bcrypt.hash(newUser.password, salt);
+      newUser.confirmPassword = await bcrypt.hash(
+        newUser.confirmPassword,
+        salt
+      );
       const adduser = await addUser(newUser);
       res.status(200).send(adduser);
     }
@@ -78,6 +115,19 @@ router.post("/forgotPassword", (req, res) => {
     }
   );
 });
+
+const validateLogin = (req) => {
+  const schema = joi.object({
+    phone: joi
+      .string()
+      .length(10)
+      .pattern(/^[0-9]+$/)
+      .required(),
+    password: joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
+  });
+
+  return schema.validate(req);
+};
 
 const validateUser = (user) => {
   const schema = joi.object({
