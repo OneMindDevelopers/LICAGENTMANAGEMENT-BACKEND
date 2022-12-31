@@ -100,8 +100,8 @@ router.post("/registration", async (req, res) => {
 
 router.post("/forgotPassword", async (req, res) => {
   const salt = await bcrypt.genSalt(10);
-  const password = await bcrypt.hash(req.body.password,salt);
-  const confirmPassword = await bcrypt.hash(req.body.confirmPassword,salt);
+  const password = await bcrypt.hash(req.body.password, salt);
+  const confirmPassword = await bcrypt.hash(req.body.confirmPassword, salt);
   const phone = req.body.phone;
   admins.findOneAndUpdate(
     { phone },
@@ -160,7 +160,11 @@ const addUser = (newUser) => {
       if (err) {
         if (err.index === 0 && err.code === 11000) {
           // Duplicate username
-          reject({ status: 422, message: "User already exist!" });
+          reject({
+            status: 422,
+            message:
+              "User already exist! & Mobile number is already registered",
+          });
         }
       } else {
         resolve(user);
