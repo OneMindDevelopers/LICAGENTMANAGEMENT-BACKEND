@@ -46,7 +46,6 @@ router.post("/login", async (req, res) => {
     if (error) return res.status(400).send(error.details[0].message);
 
     let admin = await admins.findOne({ phone: req.body.phone });
-    console.log("user", admin);
     if (!admin) return res.status(400).send("Mobile Number is not registered.");
 
     const validPassword = await bcrypt.compare(
@@ -99,10 +98,11 @@ router.post("/registration", async (req, res) => {
   }
 });
 
-router.post("/forgotPassword", (req, res) => {
+router.post("/forgotPassword", async (req, res) => {
+  const salt = await bcrypt.genSalt(10);
+  const password = await bcrypt.hash(req.body.password,salt);
+  const confirmPassword = await bcrypt.hash(req.body.confirmPassword,salt);
   const phone = req.body.phone;
-  const password = req.body.password;
-  const confirmPassword = req.body.confirmPassword;
   admins.findOneAndUpdate(
     { phone },
     { $set: { password, confirmPassword } },
