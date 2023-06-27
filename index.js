@@ -1,5 +1,4 @@
 const express = require("express");
-const path = require("path");
 const admin = require("./admins/admin-route");
 const agent = require("./agents/agent-route");
 const item = require("./items/item-route");
@@ -24,15 +23,7 @@ app.get("/", (req, res) => {
   res.send("Hello NodeJS World!...");
 });
 
-app.use(
-  express.static(path.join(__dirname, "./LICAGENTMANAGEMENT-FRONTEND/build"))
-);
 
-app.get("*", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "./LICAGENTMANAGEMENT-FRONTEND/build/index.html")
-  );
-});
 
 app.listen(port, () => {
   console.log(`Server running at port ${port} `);
