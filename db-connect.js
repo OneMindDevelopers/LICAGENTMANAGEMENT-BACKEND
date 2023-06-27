@@ -1,4 +1,6 @@
 var mongoose = require("mongoose");
-await mongoose.connect(process.env.MONGO_URL);
+mongoose.connect(MONGO_URL, {
+  useUnifiedTopology: true,
+});
 
 module.exports = mongoose;
