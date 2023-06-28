@@ -1,6 +1,9 @@
 var mongoose = require("mongoose");
-mongoose.connect(MONGO_URL, {
-  useUnifiedTopology: true,
-});
+mongoose.connect(
+  "mongodb+srv://oneminddevelopers:aaA0enJB3qXLoJRK@cluster0.5rb4qhy.mongodb.net/",
+  {
+    useUnifiedTopology: true,
+  }
+);
 
 module.exports = mongoose;
