@@ -1,6 +1,6 @@
 const mongoose = require("../db-connect");
 
-const customerSchema = mongoose.Schema({
+const customerSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true

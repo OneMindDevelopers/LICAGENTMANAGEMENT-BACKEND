@@ -1,6 +1,6 @@
 const mongoose = require("../db-connect");
 
-const nomineeSchema = mongoose.Schema({
+const nomineeSchema = new mongoose.Schema({
     name: {
         type : String,
     },

@@ -1,6 +1,6 @@
 const mongoose = require("../db-connect");
 
-const adminSchema = mongoose.Schema({
+const adminSchema = new mongoose.Schema({
     name: {
         type : String,
         required: [true, "Name required"]
